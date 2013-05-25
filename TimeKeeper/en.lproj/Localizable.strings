@@ -1,0 +1,16 @@
+/* 
+  Localizable.strings (English)
+  TimeKeeper
+
+  Created by Yasuo Miyoshi on 12/08/01.
+  Copyright (c) 2012 Kochi Univ. All rights reserved.
+*/
+
+"TimeKeeper" = "TimeKeeper";
+"Edit" = "Edit";
+"Done" = "Done";
+"min" = "min";
+"mins" = "mins";
+"SettingMemo" = "Notes";
+"SettingMemoPlaceholder" = "Option";
+"SetTime" = "Set Time";

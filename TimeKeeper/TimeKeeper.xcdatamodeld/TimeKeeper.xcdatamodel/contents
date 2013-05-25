@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<model name="" userDefinedModelVersionIdentifier="" type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="1487" systemVersion="11E53" minimumToolsVersion="Automatic" macOSVersion="Automatic" iOSVersion="Automatic">
+    <entity name="Event">
+        <attribute name="doubleBell" optional="YES" attributeType="Integer 16" syncable="YES"/>
+        <attribute name="doubleMinutes" optional="YES" attributeType="Integer 16" defaultValueString="0.0" syncable="YES"/>
+        <attribute name="note" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="order" optional="YES" attributeType="Integer 16" defaultValueString="0" syncable="YES"/>
+        <attribute name="singleBell" optional="YES" attributeType="Boolean" syncable="YES"/>
+        <attribute name="singleMinutes" optional="YES" attributeType="Integer 16" defaultValueString="0.0" syncable="YES"/>
+        <attribute name="timeStamp" optional="YES" attributeType="Date">
+            <userInfo/>
+        </attribute>
+        <attribute name="tripleBell" optional="YES" attributeType="Boolean" syncable="YES"/>
+        <attribute name="tripleMinutes" optional="YES" attributeType="Integer 16" defaultValueString="0.0" syncable="YES"/>
+        <userInfo/>
+    </entity>
+    <elements>
+        <element name="Event" positionX="0" positionY="0" width="0" height="0"/>
+    </elements>
+</model>
