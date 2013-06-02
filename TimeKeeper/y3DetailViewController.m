@@ -444,7 +444,7 @@ static void endSound(SystemSoundID ssID, void *myself)
 	if (_detailItem) {
 		vibration = [[_detailItem valueForKey:@"vibration"] boolValue];
 		flashlight = [[_detailItem valueForKey:@"flashlight"] boolValue];
-        if (vibration) [self playVibration:count+2];
+        if (vibration) [self playVibration:count];
         if (flashlight) [self blink:count];
     }
 }
