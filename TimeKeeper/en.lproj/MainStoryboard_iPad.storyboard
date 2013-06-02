@@ -30,17 +30,13 @@
                             <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFill" text="00:00" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" minimumFontSize="10" id="j7y-Np-JhI">
                                 <rect key="frame" x="3" y="8" width="695" height="344"/>
                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMaxY="YES"/>
-                                <color key="backgroundColor" red="0.36470589040000001" green="0.33333334329999997" blue="0.3058823645" alpha="1" colorSpace="deviceRGB"/>
+                                <gestureRecognizers/>
                                 <fontDescription key="fontDescription" name="GillSans-Bold" family="Gill Sans" pointSize="200"/>
                                 <color key="textColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                                 <nil key="highlightedColor"/>
-                            </label>
-                            <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" text="© 2012 Miyoshi Lab. Kochi Univ." textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" minimumFontSize="22" id="57b-XB-bI1">
-                                <rect key="frame" x="192" y="666" width="321" height="31"/>
-                                <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                <fontDescription key="fontDescription" name="GillSans" family="Gill Sans" pointSize="22"/>
-                                <color key="textColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
-                                <nil key="highlightedColor"/>
+                                <connections>
+                                    <outletCollection property="gestureRecognizers" destination="Vr4-6k-hYN" appends="YES" id="AhC-PM-3Ul"/>
+                                </connections>
                             </label>
                             <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="topRight" textAlignment="center" lineBreakMode="tailTruncation" numberOfLines="4" baselineAdjustment="alignBaselines" minimumFontSize="24" id="48t-vZ-WQY">
                                 <rect key="frame" x="399" y="390" width="69" height="132"/>
@@ -167,6 +163,7 @@
                     <connections>
                         <outlet property="buttonSubView" destination="qzc-My-idg" id="Xal-U8-yCK"/>
                         <outlet property="counterLabel" destination="j7y-Np-JhI" id="qjh-fc-KPO"/>
+                        <outlet property="detailView" destination="26" id="BiA-h8-lsg"/>
                         <outlet property="doubleTimeLabel" destination="dZ6-vf-fO0" id="5vo-gI-tgU"/>
                         <outlet property="editButton" destination="JHf-9A-JR2" id="uMp-0X-T1F"/>
                         <outlet property="singleTimeLabel" destination="48t-vZ-WQY" id="Jwf-6g-kRN"/>
@@ -176,6 +173,7 @@
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="15" sceneMemberID="firstResponder"/>
+                <tapGestureRecognizer id="Vr4-6k-hYN"/>
             </objects>
             <point key="canvasLocation" x="476" y="248"/>
         </scene>
@@ -267,6 +265,13 @@
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <color key="backgroundColor" cocoaTouchSystemColor="groupTableViewBackgroundColor"/>
                         <simulatedOrientationMetrics key="simulatedOrientationMetrics" orientation="landscapeRight"/>
+                        <label key="tableFooterView" opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" text="© 2012- Miyoshi Lab. Kochi Univ." textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" id="UoB-ZE-nmu">
+                            <rect key="frame" x="0.0" y="110" width="1024" height="44"/>
+                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                            <fontDescription key="fontDescription" type="system" pointSize="14"/>
+                            <color key="textColor" white="0.33333333333333331" alpha="1" colorSpace="calibratedWhite"/>
+                            <nil key="highlightedColor"/>
+                        </label>
                         <prototypes>
                             <tableViewCell contentMode="scaleToFill" selectionStyle="blue" indentationWidth="10" reuseIdentifier="Cell" textLabel="1U9-Xn-uds" style="IBUITableViewCellStyleDefault" id="eJf-Iy-PWp">
                                 <rect key="frame" x="0.0" y="54" width="1024" height="46"/>

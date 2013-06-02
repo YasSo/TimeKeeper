@@ -70,6 +70,7 @@
 		470990BF17510B2300CACDD6 /* ipad_icon_retina.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = ipad_icon_retina.png; path = ../ipad_icon_retina.png; sourceTree = "<group>"; };
 		474CB50915CFAD0C00385DF9 /* TimeKeeper.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = TimeKeeper.entitlements; sourceTree = "<group>"; };
 		47697ACA15CF69D700A2349C /* ipad_icon.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = ipad_icon.png; path = ../ipad_icon.png; sourceTree = "<group>"; };
+		476F00851758A6F00031D034 /* TimeKeeper 1.1.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "TimeKeeper 1.1.xcdatamodel"; sourceTree = "<group>"; };
 		479302A915BA2DC500305AAC /* AudioToolbox.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AudioToolbox.framework; path = System/Library/Frameworks/AudioToolbox.framework; sourceTree = SDKROOT; };
 		47B1DAA115C969C700638D6A /* ja */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ja; path = ja.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		47B1DAA915C96B7200638D6A /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/Localizable.strings; sourceTree = "<group>"; };
@@ -424,9 +425,10 @@
 		4700F3EB159C21FA00437DDE /* TimeKeeper.xcdatamodeld */ = {
 			isa = XCVersionGroup;
 			children = (
+				476F00851758A6F00031D034 /* TimeKeeper 1.1.xcdatamodel */,
 				4700F3EC159C21FA00437DDE /* TimeKeeper.xcdatamodel */,
 			);
-			currentVersion = 4700F3EC159C21FA00437DDE /* TimeKeeper.xcdatamodel */;
+			currentVersion = 476F00851758A6F00031D034 /* TimeKeeper 1.1.xcdatamodel */;
 			path = TimeKeeper.xcdatamodeld;
 			sourceTree = "<group>";
 			versionGroupType = wrapper.xcdatamodel;

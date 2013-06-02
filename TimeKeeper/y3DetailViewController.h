@@ -23,6 +23,7 @@
 @property (weak, nonatomic) IBOutlet UILabel *tripleTimeLabel;
 @property (weak, nonatomic) IBOutlet UIView *buttonSubView;
 @property (weak, nonatomic) IBOutlet UIButton *editButton;
+@property (weak, nonatomic) IBOutlet UIView *detailView;
 
 - (void)playSound:(int)count;
 - (void)displayClockInNavigationBar;

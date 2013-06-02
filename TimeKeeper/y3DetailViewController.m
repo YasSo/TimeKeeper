@@ -26,17 +26,19 @@
 @synthesize tripleTimeLabel = _tripleTimeLabel;
 @synthesize buttonSubView = _buttonSubView;
 @synthesize editButton = _editButton;
+@synthesize detailView = _detailView;
 @synthesize masterPopoverController = _masterPopoverController;
 
 SystemSoundID bellID, bell2ID, bell3ID;
 NSDate *startDate;
-NSTimer *timer, *clockTimer, *firstStartTimer;
+NSTimer *timer, *clockTimer, *firstStartTimer, *vibrationTimer, *blinkTimer;
 float singleSec, doubleSec, tripleSec, finishSec;
 float elapsedSec;
 bool start;
 bool isStruckSingle, isStruckDouble, isStruckTriple;
 bool doubleBell, tripleBell;
-int remainingSound;
+bool remainingTimeMode;
+int remainingSound, remainingVibration, remainingBlink;
 
 #pragma mark - Managing the detail item
 
@@ -137,6 +139,7 @@ int remainingSound;
 	timer = nil;
 	elapsedSec = 0.0f;
 	remainingSound = 0;
+    remainingTimeMode = NO;
 	isStruckSingle = isStruckDouble = isStruckTriple = NO;
 //	soundURL = CFBundleCopyResourceURL(CFBundleGetBundleWithIdentifier(CFSTR("com.apple.UIKit")), CFSTR ("Tock"),CFSTR ("aiff"),NULL);
 	soundURL = (__bridge CFURLRef)[[NSBundle mainBundle] URLForResource: @"bell1" withExtension: @"aiff"];
@@ -145,6 +148,10 @@ int remainingSound;
 	AudioServicesCreateSystemSoundID(soundURL, &bell2ID);
 	soundURL = (__bridge CFURLRef)[[NSBundle mainBundle] URLForResource: @"bell3" withExtension: @"aiff"];
 	AudioServicesCreateSystemSoundID(soundURL, &bell3ID);
+    
+    _counterLabel.userInteractionEnabled = YES;
+    UITapGestureRecognizer *tapGesture = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(tapCounter:)];
+    [_counterLabel addGestureRecognizer:tapGesture];
 }
 
 - (void)viewDidUnload
@@ -165,6 +172,7 @@ int remainingSound;
 	[self setNavItem:nil];
 	[self setButtonSubView:nil];
 	[self setEditButton:nil];
+    [self setDetailView:nil];
 	[super viewDidUnload];
 }
 
@@ -262,6 +270,11 @@ int remainingSound;
 
 #pragma mark - TimeKeeper
 
+- (IBAction)tapCounter:(id)sender {
+    remainingTimeMode = !remainingTimeMode;
+    [self updateCounterLabel];
+}
+
 - (IBAction)tap:(id)sender {
 	if ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPhone) {
 		UIInterfaceOrientation orientation = [[UIApplication sharedApplication] statusBarOrientation];
@@ -321,7 +334,7 @@ int remainingSound;
 		[[UIApplication sharedApplication] setIdleTimerDisabled:YES];	// スリープさせない
 	}
 	else {
-		elapsedSec += -[startDate timeIntervalSinceNow];
+		elapsedSec -= [startDate timeIntervalSinceNow];
 		[timer invalidate];
 		timer = nil;
 		if ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPhone)
@@ -338,10 +351,10 @@ int remainingSound;
 	isStruckSingle = isStruckDouble = isStruckTriple = NO;
 	elapsedSec = 0.0f;
 	startDate = [NSDate date];
-	_counterLabel.text = @"00:00";
 	_timeProgressView.progress = 0.0f;
 	_counterLabel.textColor = [UIColor colorWithRed:1.0f green:1.0f blue:1.0f alpha:1.0f];
 	_timeProgressView.progressTintColor = [UIColor colorWithRed:1.0f green:191.0f/255.0f blue:83.0f/255.0f alpha:1.0f];
+    [self updateCounterLabel];
 }
 
 - (IBAction)pushReset:(id)sender
@@ -367,8 +380,60 @@ static void endSound(SystemSoundID ssID, void *myself)
 //	NSLog(@"RING!!");
 }
 
+- (void)playVibration:(int)count
+{
+    remainingVibration += count;
+    [self onVibrationTimer:nil];
+    if (!vibrationTimer)
+        vibrationTimer = [NSTimer scheduledTimerWithTimeInterval:0.6f target:self selector:@selector(onVibrationTimer:) userInfo:nil repeats:YES];
+}
+
+- (void)onVibrationTimer:(NSTimer *)theTimer
+{
+    if (remainingVibration <= 0) {
+        if (vibrationTimer) [vibrationTimer invalidate];
+        vibrationTimer = nil;
+        return;
+    }
+	AudioServicesPlaySystemSound(kSystemSoundID_Vibrate);
+//    NSLog(@"Vibrate!!");
+    remainingVibration--;
+}
+
+- (void)blink:(int)count
+{
+    remainingBlink += count * 6;
+    [self onBlinkTimer:nil];
+    if (!blinkTimer)
+        blinkTimer = [NSTimer scheduledTimerWithTimeInterval:0.1f target:self selector:@selector(onBlinkTimer:) userInfo:nil repeats:YES];
+}
+
+- (void)onBlinkTimer:(NSTimer *)theTimer
+{
+    UIColor *color;
+    if (remainingBlink % 2 == 1) {
+        color = [UIColor colorWithRed:1.0f green:1.0f blue:1.0f alpha:1.0f];
+        [_buttonSubView setAlpha:0.0f];
+        [_timeProgressView setAlpha:0.0f];
+    }
+    else {
+        color = [UIColor colorWithRed:0.29194f green:0.263998f blue:0.239367f alpha:1.0f];
+        [_buttonSubView setAlpha:1.0f];
+        [_timeProgressView setAlpha:1.0f];
+    }
+    [_detailView setBackgroundColor:color];
+    if (remainingBlink <= 0) {
+        if (blinkTimer) [blinkTimer invalidate];
+        blinkTimer = nil;
+        return;
+    }
+//    NSLog(@"Blink!!");
+    remainingBlink--;
+}
+
 - (void)ringBell:(int)count
 {
+    bool vibration, flashlight;
     if (count == 2)
         AudioServicesPlaySystemSound(bell2ID);
     else if (count == 3)
@@ -376,6 +441,12 @@ static void endSound(SystemSoundID ssID, void *myself)
     else if (count == 1)
         AudioServicesPlaySystemSound(bellID);
     else [self playSound:count];
+	if (_detailItem) {
+		vibration = [[_detailItem valueForKey:@"vibration"] boolValue];
+		flashlight = [[_detailItem valueForKey:@"flashlight"] boolValue];
+        if (vibration) [self playVibration:count+2];
+        if (flashlight) [self blink:count];
+    }
 }
 
 - (IBAction)pushBell:(id)sender
@@ -392,9 +463,6 @@ static void endSound(SystemSoundID ssID, void *myself)
 		_timeProgressView.progressTintColor = [UIColor colorWithRed:1.0f green:0.3f blue:0.0f alpha:1.0f];
 		_counterLabel.textColor = [UIColor colorWithRed:1.0f green:0.8f blue:0.75f alpha:1.0f];
 	}
-    int minute = (int) t / 60;
-    int second = (int) t % 60;
-    _counterLabel.text = [NSString stringWithFormat:@"%02d:%02d", minute, second];
 	if (!isStruckSingle && t >= singleSec) {
 		isStruckSingle = YES;
 		[self ringBell:1];
@@ -407,6 +475,21 @@ static void endSound(SystemSoundID ssID, void *myself)
 		isStruckTriple = YES;
 		[self ringBell:3];
 	}
+    [self updateCounterLabel];
+}
+
+- (void)updateCounterLabel
+{
+    NSTimeInterval tc = elapsedSec;
+    if (timer) tc -= [startDate timeIntervalSinceNow];
+    int t = (int)tc;
+    if (remainingTimeMode) t = finishSec - tc;
+    int minute = abs((int) t / 60);
+    int second = abs((int) t % 60);
+    if (tc > finishSec && remainingTimeMode)
+        _counterLabel.text = [NSString stringWithFormat:@"-%02d:%02d", minute, second];
+    else
+        _counterLabel.text = [NSString stringWithFormat:@"%02d:%02d", minute, second];
 }
 
 - (void)displayClockInNavigationBar {

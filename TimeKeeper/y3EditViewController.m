@@ -15,6 +15,8 @@
 
 @synthesize editItem = _editItem;
 @synthesize settingMemoField = _settingMemoField;
+@synthesize vibrationSW = _vibrationSW;
+@synthesize flashlightSW = _flashlightSW;
 @synthesize doubleBellSW = _doubleBellSW;
 @synthesize tripleBellSW = _tripleBellSW;
 @synthesize singleMinStepper = _singleMinStepper;
@@ -45,12 +47,14 @@
 	// Do any additional setup after loading the view.
 	self.navigationItem.title = NSLocalizedString(@"Edit", @"Edit");
 	if ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPad) {
-		self.contentSizeForViewInPopover = CGSizeMake(320, 400);
+		self.contentSizeForViewInPopover = CGSizeMake(320, 550);
 	}
 }
 
 - (void)viewDidUnload
 {
+	[self setVibrationSW:nil];
+	[self setFlashlightSW:nil];
 	[self setDoubleBellSW:nil];
 	[self setTripleBellSW:nil];
 	[self setSingleMinStepper:nil];
@@ -81,8 +85,8 @@
 
 - (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView
 {
-	if (![[_editItem valueForKey:@"doubleBell"] boolValue]) return 3;
-	return 4;
+	if (![[_editItem valueForKey:@"doubleBell"] boolValue]) return 4;
+	return 5;
 }
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section{
@@ -92,12 +96,15 @@
 		return 1;
 	}
 	if (section == 2) {
-		if (![[_editItem valueForKey:@"doubleBell"] boolValue]) return 1;
+		if (![[_editItem valueForKey:@"doubleBell"] boolValue]) return 2;
 		if ([[_editItem valueForKey:@"tripleBell"] boolValue]) return 2;
 		return 1;
 	}
-	if (section == 3) return 1;
-	return 0;
+    if (section == 3) {
+        if ([[_editItem valueForKey:@"doubleBell"] boolValue]) return 2;
+        return 1;
+    }
+    return 1;
 }
 
 - (void)memoChanged:(id)sender
@@ -114,6 +121,8 @@
 - (void)switchChanged:(id)sender
 {
     NSError *error = nil;
+    [_editItem setValue:[NSNumber numberWithBool:_vibrationSW.on] forKey:@"vibration"];
+    [_editItem setValue:[NSNumber numberWithBool:_flashlightSW.on] forKey:@"flashlight"];
 	[_editItem setValue:[NSNumber numberWithBool:_doubleBellSW.on] forKey:@"doubleBell"];
 	if (_tripleBellSW)
 		[_editItem setValue:[NSNumber numberWithBool:_tripleBellSW.on] forKey:@"tripleBell"];
@@ -262,11 +271,32 @@
     if (cell == nil) {
         cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:@"Cell"];
     }
-	int noteSection;
-	if ([[_editItem valueForKey:@"doubleBell"] boolValue]) noteSection = 3;
-	else noteSection = 2;
-    if (indexPath.section == noteSection) {
-		[cell.textLabel setText:NSLocalizedString(@"SettingMemo", @"SettingMemo")];
+	int optionSection, noteSection;
+	if ([[_editItem valueForKey:@"doubleBell"] boolValue]) {
+        optionSection = 3;
+        noteSection = 4;
+    }
+	else {
+        optionSection = 2;
+        noteSection = 3;
+    }
+    if (indexPath.section == optionSection) {
+        UISwitch *sw = [[UISwitch alloc] init];
+        [sw addTarget:self action:@selector(switchChanged:) forControlEvents:UIControlEventValueChanged];
+        [cell setAccessoryView:sw];
+        if (indexPath.row == 0) {
+            [cell.textLabel setText:NSLocalizedString(@"Vibration", @"Vibration")];
+            [sw setOn:[[_editItem valueForKey:@"vibration"] boolValue]];
+            [self setVibrationSW:sw];
+        }
+        else {
+            [cell.textLabel setText:NSLocalizedString(@"Flashlight", @"Flashlight")];
+            [sw setOn:[[_editItem valueForKey:@"flashlight"] boolValue]];
+            [self setFlashlightSW:sw];
+        }
+    }
+    else if (indexPath.section == noteSection) {
+		[cell.textLabel setText:NSLocalizedString(@"SettingMemo", @"Notes")];
 		UITextField *field = [[UITextField alloc] initWithFrame:CGRectMake(0, 0, 190, cell.frame.size.height)];
 		[field setTextColor:[UIColor colorWithRed:59.0/255.0 green:85.0/255.0 blue:133.0/255.0 alpha:1.0]];
 		[field setContentVerticalAlignment:UIControlContentVerticalAlignmentCenter];
