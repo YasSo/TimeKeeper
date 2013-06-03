@@ -11,8 +11,10 @@
 "Done" = "Done";
 "min" = "min";
 "mins" = "mins";
-"Vibration" = "Vibration";
-"Flashlight" = "Flashlight";
+"Vibrate" = "Vibrate";
+"FlashScreen" = "Flash Screen";
 "SettingMemo" = "Notes";
 "SettingMemoPlaceholder" = "Option";
 "SetTime" = "Set Time";
+"ElapsedTime" = "Elapsed Time";
+"RemainingTime" = "Remaining Time";

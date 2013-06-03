@@ -293,12 +293,6 @@
         <class className="y3DetailViewController" superclassName="UIViewController">
             <source key="sourceIdentifier" type="project" relativePath="./Classes/y3DetailViewController.h"/>
             <relationships>
-                <relationship kind="action" name="pushBell:"/>
-                <relationship kind="action" name="pushEdit:"/>
-                <relationship kind="action" name="pushReset:"/>
-                <relationship kind="action" name="pushStart:"/>
-                <relationship kind="action" name="tap:"/>
-                <relationship kind="action" name="tapCounter:"/>
                 <relationship kind="outlet" name="buttonSubView" candidateClass="UIView"/>
                 <relationship kind="outlet" name="counterLabel" candidateClass="UILabel"/>
                 <relationship kind="outlet" name="detailView" candidateClass="UIView"/>

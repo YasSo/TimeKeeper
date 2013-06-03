@@ -38,7 +38,7 @@ bool start;
 bool isStruckSingle, isStruckDouble, isStruckTriple;
 bool doubleBell, tripleBell;
 bool remainingTimeMode;
-int remainingSound, remainingVibration, remainingBlink;
+int remainingSound, remainingVibration, remainingBlink, displayTimeMode;
 
 #pragma mark - Managing the detail item
 
@@ -140,6 +140,7 @@ int remainingSound, remainingVibration, remainingBlink;
 	elapsedSec = 0.0f;
 	remainingSound = 0;
     remainingTimeMode = NO;
+    displayTimeMode = 15;
 	isStruckSingle = isStruckDouble = isStruckTriple = NO;
 //	soundURL = CFBundleCopyResourceURL(CFBundleGetBundleWithIdentifier(CFSTR("com.apple.UIKit")), CFSTR ("Tock"),CFSTR ("aiff"),NULL);
 	soundURL = (__bridge CFURLRef)[[NSBundle mainBundle] URLForResource: @"bell1" withExtension: @"aiff"];
@@ -206,8 +207,8 @@ int remainingSound, remainingVibration, remainingBlink;
 - (void)viewDidAppear:(BOOL)animated
 {
 	UIInterfaceOrientation orientation = [[UIApplication sharedApplication] statusBarOrientation];
+    clockTimer = [NSTimer scheduledTimerWithTimeInterval:0.1f target:self selector:@selector(onClockTimer:) userInfo:nil repeats:YES];
 	if ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPhone) {
-		clockTimer = [NSTimer scheduledTimerWithTimeInterval:0.2f target:self selector:@selector(onClockTimer:) userInfo:nil repeats:YES];
 		if (orientation == UIInterfaceOrientationPortrait) {
 			[[UIApplication sharedApplication] setStatusBarHidden:NO];
 		}
@@ -272,7 +273,9 @@ int remainingSound, remainingVibration, remainingBlink;
 
 - (IBAction)tapCounter:(id)sender {
     remainingTimeMode = !remainingTimeMode;
+    displayTimeMode = 15;
     [self updateCounterLabel];
+    [self updateTimeMode];
 }
 
 - (IBAction)tap:(id)sender {
@@ -433,7 +436,7 @@ static void endSound(SystemSoundID ssID, void *myself)
 
 - (void)ringBell:(int)count
 {
-    bool vibration, flashlight;
+    bool vibrate, flashScreen;
     if (count == 2)
         AudioServicesPlaySystemSound(bell2ID);
     else if (count == 3)
@@ -442,10 +445,10 @@ static void endSound(SystemSoundID ssID, void *myself)
         AudioServicesPlaySystemSound(bellID);
     else [self playSound:count];
 	if (_detailItem) {
-		vibration = [[_detailItem valueForKey:@"vibration"] boolValue];
-		flashlight = [[_detailItem valueForKey:@"flashlight"] boolValue];
-        if (vibration) [self playVibration:count];
-        if (flashlight) [self blink:count];
+		vibrate = [[_detailItem valueForKey:@"vibrate"] boolValue];
+		flashScreen = [[_detailItem valueForKey:@"flashScreen"] boolValue];
+        if (vibrate) [self playVibration:count];
+        if (flashScreen) [self blink:count];
     }
 }
 
@@ -492,6 +495,14 @@ static void endSound(SystemSoundID ssID, void *myself)
         _counterLabel.text = [NSString stringWithFormat:@"%02d:%02d", minute, second];
 }
 
+- (void)updateTimeMode
+{
+    if (remainingTimeMode)
+        self.navigationItem.title = NSLocalizedString(@"RemainingTime", @"Remaining Time");
+    else
+        self.navigationItem.title = NSLocalizedString(@"ElapsedTime", @"Elapsed Time");
+}
+
 - (void)displayClockInNavigationBar {
 	NSDateFormatter *formatter = [[NSDateFormatter alloc] init];
 	[formatter setLocale:[NSLocale systemLocale]];
@@ -503,12 +514,13 @@ static void endSound(SystemSoundID ssID, void *myself)
 - (void)onClockTimer:(NSTimer *)theTimer
 {
     UIInterfaceOrientation orientation = [[UIApplication sharedApplication] statusBarOrientation];
-	if (orientation == UIInterfaceOrientationPortrait) {
-        self.navigationItem.title = @"";
+    if (displayTimeMode > 0) {
+        [self updateTimeMode];
+        displayTimeMode--;
     }
-    else {
+    else if ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPhone && orientation != UIInterfaceOrientationPortrait)
         [self displayClockInNavigationBar];
-    }
+    else self.navigationItem.title = @"";
 }
 
 @end

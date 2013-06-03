@@ -15,8 +15,8 @@
 
 @synthesize editItem = _editItem;
 @synthesize settingMemoField = _settingMemoField;
-@synthesize vibrationSW = _vibrationSW;
-@synthesize flashlightSW = _flashlightSW;
+@synthesize vibrateSW = _vibrateSW;
+@synthesize flashScreenSW = _flashScreenSW;
 @synthesize doubleBellSW = _doubleBellSW;
 @synthesize tripleBellSW = _tripleBellSW;
 @synthesize singleMinStepper = _singleMinStepper;
@@ -53,8 +53,8 @@
 
 - (void)viewDidUnload
 {
-	[self setVibrationSW:nil];
-	[self setFlashlightSW:nil];
+	[self setVibrateSW:nil];
+	[self setFlashScreenSW:nil];
 	[self setDoubleBellSW:nil];
 	[self setTripleBellSW:nil];
 	[self setSingleMinStepper:nil];
@@ -121,8 +121,8 @@
 - (void)switchChanged:(id)sender
 {
     NSError *error = nil;
-    [_editItem setValue:[NSNumber numberWithBool:_vibrationSW.on] forKey:@"vibration"];
-    [_editItem setValue:[NSNumber numberWithBool:_flashlightSW.on] forKey:@"flashlight"];
+    [_editItem setValue:[NSNumber numberWithBool:_vibrateSW.on] forKey:@"vibrate"];
+    [_editItem setValue:[NSNumber numberWithBool:_flashScreenSW.on] forKey:@"flashScreen"];
 	[_editItem setValue:[NSNumber numberWithBool:_doubleBellSW.on] forKey:@"doubleBell"];
 	if (_tripleBellSW)
 		[_editItem setValue:[NSNumber numberWithBool:_tripleBellSW.on] forKey:@"tripleBell"];
@@ -285,14 +285,14 @@
         [sw addTarget:self action:@selector(switchChanged:) forControlEvents:UIControlEventValueChanged];
         [cell setAccessoryView:sw];
         if (indexPath.row == 0) {
-            [cell.textLabel setText:NSLocalizedString(@"Vibration", @"Vibration")];
-            [sw setOn:[[_editItem valueForKey:@"vibration"] boolValue]];
-            [self setVibrationSW:sw];
+            [cell.textLabel setText:NSLocalizedString(@"Vibrate", @"Vibrate")];
+            [sw setOn:[[_editItem valueForKey:@"vibrate"] boolValue]];
+            [self setVibrateSW:sw];
         }
         else {
-            [cell.textLabel setText:NSLocalizedString(@"Flashlight", @"Flashlight")];
-            [sw setOn:[[_editItem valueForKey:@"flashlight"] boolValue]];
-            [self setFlashlightSW:sw];
+            [cell.textLabel setText:NSLocalizedString(@"FlashScreen", @"Flash Screen")];
+            [sw setOn:[[_editItem valueForKey:@"flashScreen"] boolValue]];
+            [self setFlashScreenSW:sw];
         }
     }
     else if (indexPath.section == noteSection) {

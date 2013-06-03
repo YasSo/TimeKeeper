@@ -3,17 +3,16 @@
     <entity name="Event">
         <attribute name="doubleBell" optional="YES" attributeType="Boolean" syncable="YES"/>
         <attribute name="doubleMinutes" optional="YES" attributeType="Integer 16" defaultValueString="0.0" syncable="YES"/>
-        <attribute name="flashlight" optional="YES" attributeType="Boolean" syncable="YES"/>
+        <attribute name="flashScreen" optional="YES" attributeType="Boolean" syncable="YES"/>
         <attribute name="note" optional="YES" attributeType="String" syncable="YES"/>
         <attribute name="order" optional="YES" attributeType="Integer 16" defaultValueString="0" syncable="YES"/>
-        <attribute name="singleBell" optional="YES" attributeType="Boolean" syncable="YES"/>
         <attribute name="singleMinutes" optional="YES" attributeType="Integer 16" defaultValueString="0.0" syncable="YES"/>
         <attribute name="timeStamp" optional="YES" attributeType="Date">
             <userInfo/>
         </attribute>
         <attribute name="tripleBell" optional="YES" attributeType="Boolean" syncable="YES"/>
         <attribute name="tripleMinutes" optional="YES" attributeType="Integer 16" defaultValueString="0.0" syncable="YES"/>
-        <attribute name="vibration" optional="YES" attributeType="Boolean" syncable="YES"/>
+        <attribute name="vibrate" optional="YES" attributeType="Boolean" syncable="YES"/>
         <userInfo/>
     </entity>
     <elements>

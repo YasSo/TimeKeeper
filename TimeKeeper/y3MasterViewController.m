@@ -83,7 +83,6 @@
     [newManagedObject setValue:[NSNumber numberWithInt:10] forKey:@"singleMinutes"];
 	[newManagedObject setValue:[NSNumber numberWithInt:12] forKey:@"doubleMinutes"];
 	[newManagedObject setValue:[NSNumber numberWithInt:15] forKey:@"tripleMinutes"];
-	[newManagedObject setValue:[NSNumber numberWithBool:YES] forKey:@"singleBell"];
 	[newManagedObject setValue:[NSNumber numberWithBool:YES] forKey:@"doubleBell"];
 	[newManagedObject setValue:[NSNumber numberWithBool:YES] forKey:@"tripleBell"];
 	[newManagedObject setValue:@"" forKey:@"note"];

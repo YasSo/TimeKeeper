@@ -14,8 +14,8 @@
 
 @property (strong, nonatomic) NSManagedObject *editItem;
 @property (strong, nonatomic) UITextField *settingMemoField;
-@property (strong, nonatomic) UISwitch *vibrationSW;
-@property (strong, nonatomic) UISwitch *flashlightSW;
+@property (strong, nonatomic) UISwitch *vibrateSW;
+@property (strong, nonatomic) UISwitch *flashScreenSW;
 @property (strong, nonatomic) UISwitch *doubleBellSW;
 @property (strong, nonatomic) UISwitch *tripleBellSW;
 @property (strong, nonatomic) UIStepper *singleMinStepper;

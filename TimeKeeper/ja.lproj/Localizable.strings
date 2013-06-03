@@ -11,8 +11,10 @@
 "Done" = "完了";
 "min" = "分";
 "mins" = "分";
-"Vibration" = "バイブレーション";
-"Flashlight" = "画面フラッシュ";
+"Vibrate" = "バイブレーション";
+"FlashScreen" = "画面フラッシュ";
 "SettingMemo" = "設定メモ";
 "SettingMemoPlaceholder" = "オプション";
 "SetTime" = "時間設定";
+"ElapsedTime" = "経過時間";
+"RemainingTime" = "残り時間";
