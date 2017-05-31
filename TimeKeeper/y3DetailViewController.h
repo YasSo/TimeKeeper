@@ -21,9 +21,13 @@
 @property (weak, nonatomic) IBOutlet UILabel *singleTimeLabel;
 @property (weak, nonatomic) IBOutlet UILabel *doubleTimeLabel;
 @property (weak, nonatomic) IBOutlet UILabel *tripleTimeLabel;
-@property (weak, nonatomic) IBOutlet UIView *buttonSubView;
 @property (weak, nonatomic) IBOutlet UIButton *editButton;
 @property (weak, nonatomic) IBOutlet UIView *detailView;
+@property (weak, nonatomic) IBOutlet UIToolbar *operationBar;
+
+- (void)startCounter;
+- (void)resetCounter;
+- (void)ringBell:(int)count;
 
 - (void)playSound:(int)count;
 - (void)displayClockInNavigationBar;

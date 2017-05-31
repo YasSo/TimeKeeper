@@ -16,29 +16,14 @@
 
 @implementation y3DetailViewController
 
-@synthesize detailItem = _detailItem;
-@synthesize editPopover = _editPopover;
-@synthesize navItem = _navItem;
-@synthesize timeProgressView = _timeProgressView;
-@synthesize counterLabel = _counterLabel;
-@synthesize singleTimeLabel = _singleTimeLabel;
-@synthesize doubleTimeLabel = _doubleTimeLabel;
-@synthesize tripleTimeLabel = _tripleTimeLabel;
-@synthesize buttonSubView = _buttonSubView;
-@synthesize editButton = _editButton;
-@synthesize detailView = _detailView;
-@synthesize masterPopoverController = _masterPopoverController;
-
 SystemSoundID bellID, bell2ID, bell3ID;
 NSDate *startDate;
 NSTimer *timer, *clockTimer, *firstStartTimer, *vibrationTimer, *blinkTimer;
-float singleSec, doubleSec, tripleSec, finishSec;
-float elapsedSec;
-bool start;
-bool isStruckSingle, isStruckDouble, isStruckTriple;
-bool doubleBell, tripleBell;
-bool remainingTimeMode;
+float singleSec, doubleSec, tripleSec, finishSec, elapsedSec;
+bool start, isStruckSingle, isStruckDouble, isStruckTriple, doubleBell, tripleBell, remainingTimeMode;
 int remainingSound, remainingVibration, remainingBlink, displayTimeMode;
+
+#define SYSTEM_VERSION_GREATER_THAN_OR_EQUAL_TO(v)  ([[[UIDevice currentDevice] systemVersion] compare:v options:NSNumericSearch] != NSOrderedAscending)
 
 #pragma mark - Managing the detail item
 
@@ -62,9 +47,9 @@ int remainingSound, remainingVibration, remainingBlink, displayTimeMode;
 - (void)locateTimeLabel
 {
 	float singleX, doubleX, tripleX;
-	[_doubleTimeLabel setHidden:!doubleBell];
-	if (doubleBell) [_tripleTimeLabel setHidden:!tripleBell];
-	else [_tripleTimeLabel setHidden:YES];
+    _doubleTimeLabel.hidden = !doubleBell;
+	if (doubleBell) _tripleTimeLabel.hidden = !tripleBell;
+    else _tripleTimeLabel.hidden = YES;
 	
 	singleX = (singleSec / finishSec) * (_timeProgressView.frame.size.width - 10.0f) + _timeProgressView.frame.origin.x + 5.0f;
 	doubleX = (doubleSec / finishSec) * (_timeProgressView.frame.size.width - 10.0f) + _timeProgressView.frame.origin.x + 5.0f;
@@ -77,34 +62,46 @@ int remainingSound, remainingVibration, remainingBlink, displayTimeMode;
 - (void)configureView
 {
 	int maxMins, singleMins, doubleMins, tripleMins;
+    NSString *fontName = @"GillSans-Bold";
 	UIInterfaceOrientation orientation = [[UIApplication sharedApplication] statusBarOrientation];
+    CGRect applicationFrame = [[UIScreen mainScreen] applicationFrame];
+    float y;
 	if ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPhone) {
 		// iPhone の場合
 		if (orientation == UIInterfaceOrientationPortrait) {
 			// 縦向き (Portrait)
-			[_buttonSubView setHidden:NO];
-			_counterLabel.font = [UIFont fontWithName:@"GillSans-Bold" size:100.0f];
-			_counterLabel.center = CGPointMake(_counterLabel.center.x, 140);
+            _operationBar.hidden = NO;
+			_counterLabel.font = [UIFont fontWithName:fontName size:100.0f];
+            y = applicationFrame.size.height / 2.6;
+			_counterLabel.center = CGPointMake(_counterLabel.center.x, y);
+            _timeProgressView.center = CGPointMake(_timeProgressView.center.x, y+50.0f);
 		}
 		else {
 			// 横向き (Landscape)
-			[_buttonSubView setHidden:YES];
-			_counterLabel.font = [UIFont fontWithName:@"GillSans-Bold" size:160.0f];
-			_counterLabel.center = CGPointMake(_counterLabel.center.x, 130);
+//			_operationBar.hidden = YES;
+			_counterLabel.font = [UIFont fontWithName:fontName size:160.0f];
+            if (SYSTEM_VERSION_GREATER_THAN_OR_EQUAL_TO(@"8.0")) y = applicationFrame.size.height / 2.8;
+            else y = applicationFrame.size.width / 2.8;
+			_counterLabel.center = CGPointMake(_counterLabel.center.x, y);
+            _timeProgressView.center = CGPointMake(_timeProgressView.center.x, y+80.0f);
 			[self displayClockInNavigationBar];
 		}
+        _singleTimeLabel.center = CGPointMake(_singleTimeLabel.center.x, _timeProgressView.center.y+_singleTimeLabel.frame.size.height/2.0f);
+        _doubleTimeLabel.center = CGPointMake(_doubleTimeLabel.center.x, _timeProgressView.center.y+_doubleTimeLabel.frame.size.height/2.0f);
+        _tripleTimeLabel.center = CGPointMake(_tripleTimeLabel.center.x, _timeProgressView.center.y+_tripleTimeLabel.frame.size.height/2.0f);
 	}
 	else {
 		// iPad の場合
 		if (orientation == UIInterfaceOrientationPortrait || orientation == UIInterfaceOrientationPortraitUpsideDown) {
 			// 縦向き (Portrait)
-			_counterLabel.font = [UIFont fontWithName:@"GillSans-Bold" size:260.0f];
-			_counterLabel.center = CGPointMake(_counterLabel.center.x, 350);
+//            _operationBar.hidden = NO;
+//			_counterLabel.font = [UIFont fontWithName:fontName size:260.0f];
+//			_counterLabel.center = CGPointMake(_counterLabel.center.x, 350);
 		}
 		else {
 			// 横向き (Landscape)
-			_counterLabel.font = [UIFont fontWithName:@"GillSans-Bold" size:360.0f];
-			_counterLabel.center = CGPointMake(_counterLabel.center.x, 250);
+//			_counterLabel.font = [UIFont fontWithName:fontName size:360.0f];
+//			_counterLabel.center = CGPointMake(_counterLabel.center.x, 250);
 		}
 	}
     // Update the user interface for the detail item.
@@ -112,9 +109,9 @@ int remainingSound, remainingVibration, remainingBlink, displayTimeMode;
 		singleMins = [[_detailItem valueForKey:@"singleMinutes"] intValue];
 		doubleMins = [[_detailItem valueForKey:@"doubleMinutes"] intValue];
 		tripleMins = [[_detailItem valueForKey:@"tripleMinutes"] intValue];
-		_singleTimeLabel.text = [NSString stringWithFormat:@"▲\n%02d:00\n\n\n", singleMins];
-		_doubleTimeLabel.text = [NSString stringWithFormat:@"▲\n▲\n%02d:00\n\n", doubleMins];
-		_tripleTimeLabel.text = [NSString stringWithFormat:@"▲\n▲\n▲\n%02d:00\n", tripleMins];
+		_singleTimeLabel.text = [NSString stringWithFormat:@"▲\n%02d:00", singleMins];
+		_doubleTimeLabel.text = [NSString stringWithFormat:@"▲\n▲\n%02d:00", doubleMins];
+		_tripleTimeLabel.text = [NSString stringWithFormat:@"▲\n▲\n▲\n%02d:00", tripleMins];
 		doubleBell = [[_detailItem valueForKey:@"doubleBell"] boolValue];
 		tripleBell = [[_detailItem valueForKey:@"tripleBell"] boolValue];
 		maxMins = singleMins;
@@ -141,8 +138,9 @@ int remainingSound, remainingVibration, remainingBlink, displayTimeMode;
 	remainingSound = 0;
     remainingTimeMode = NO;
     displayTimeMode = 15;
-	isStruckSingle = isStruckDouble = isStruckTriple = NO;
-//	soundURL = CFBundleCopyResourceURL(CFBundleGetBundleWithIdentifier(CFSTR("com.apple.UIKit")), CFSTR ("Tock"),CFSTR ("aiff"),NULL);
+    isStruckSingle = isStruckDouble = isStruckTriple = NO;
+    
+    //	soundURL = CFBundleCopyResourceURL(CFBundleGetBundleWithIdentifier(CFSTR("com.apple.UIKit")), CFSTR ("Tock"),CFSTR ("aiff"),NULL);
 	soundURL = (__bridge CFURLRef)[[NSBundle mainBundle] URLForResource: @"bell1" withExtension: @"aiff"];
 	AudioServicesCreateSystemSoundID(soundURL, &bellID);
 	soundURL = (__bridge CFURLRef)[[NSBundle mainBundle] URLForResource: @"bell2" withExtension: @"aiff"];
@@ -151,8 +149,6 @@ int remainingSound, remainingVibration, remainingBlink, displayTimeMode;
 	AudioServicesCreateSystemSoundID(soundURL, &bell3ID);
     
     _counterLabel.userInteractionEnabled = YES;
-    UITapGestureRecognizer *tapGesture = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(tapCounter:)];
-    [_counterLabel addGestureRecognizer:tapGesture];
 }
 
 - (void)viewDidUnload
@@ -165,15 +161,16 @@ int remainingSound, remainingVibration, remainingBlink, displayTimeMode;
 	AudioServicesDisposeSystemSoundID(bellID);
 	AudioServicesDisposeSystemSoundID(bell2ID);
 	AudioServicesDisposeSystemSoundID(bell3ID);
-    [self setCounterLabel:nil];
-	[self setSingleTimeLabel:nil];
-	[self setDoubleTimeLabel:nil];
-	[self setTripleTimeLabel:nil];
-	[self setTimeProgressView:nil];
-	[self setNavItem:nil];
-	[self setButtonSubView:nil];
-	[self setEditButton:nil];
-    [self setDetailView:nil];
+    
+    self.counterLabel = nil;
+    self.singleTimeLabel = nil;
+    self.doubleTimeLabel = nil;
+    self.tripleTimeLabel = nil;
+    self.timeProgressView = nil;
+    self.navItem = nil;
+    self.editButton = nil;
+    self.detailView = nil;
+    
 	[super viewDidUnload];
 }
 
@@ -183,22 +180,22 @@ int remainingSound, remainingVibration, remainingBlink, displayTimeMode;
 		[clockTimer invalidate];
 		clockTimer = nil;
 	}
-	[self.navigationController.navigationBar setBarStyle:UIBarStyleDefault];
+//    self.navigationController.navigationBar.barStyle = UIBarStyleDefault;
 	if ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPhone) {
-		[[UIApplication sharedApplication] setStatusBarStyle:UIStatusBarStyleDefault];
+//        [UIApplication sharedApplication].statusBarStyle = UIStatusBarStyleDefault;
 		if ([UIApplication sharedApplication].statusBarHidden) {
-			[[UIApplication sharedApplication] setStatusBarHidden:NO];
-			[self.navigationController setNavigationBarHidden:YES];
-			[self.navigationController setNavigationBarHidden:NO];
+            [UIApplication sharedApplication].statusBarHidden = NO;
+            self.navigationController.navigationBarHidden = YES;
+            self.navigationController.navigationBarHidden = NO;
 		}
 	}
 }
 
 - (void)viewWillAppear:(BOOL)animated
 {
-	[self.navigationController.navigationBar setBarStyle:UIBarStyleBlackTranslucent];
+//    self.navigationController.navigationBar.barStyle = UIBarStyleBlackTranslucent;
 	if ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPhone) {
-		[[UIApplication sharedApplication] setStatusBarStyle:UIStatusBarStyleBlackTranslucent];
+        [UIApplication sharedApplication].statusBarStyle = UIStatusBarStyleLightContent;
 	}
 	_navItem.title = @"";
 	[self resetCounter];
@@ -210,14 +207,15 @@ int remainingSound, remainingVibration, remainingBlink, displayTimeMode;
     clockTimer = [NSTimer scheduledTimerWithTimeInterval:0.1f target:self selector:@selector(onClockTimer:) userInfo:nil repeats:YES];
 	if ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPhone) {
 		if (orientation == UIInterfaceOrientationPortrait) {
-			[[UIApplication sharedApplication] setStatusBarHidden:NO];
+            [UIApplication sharedApplication].statusBarHidden = NO;
 		}
 		else {
-			[[UIApplication sharedApplication] setStatusBarHidden:YES];
-			[self.navigationController setNavigationBarHidden:YES];
-			[self.navigationController setNavigationBarHidden:NO];
+            [UIApplication sharedApplication].statusBarHidden = YES;
+            self.navigationController.navigationBarHidden = YES;
+            self.navigationController.navigationBarHidden = NO;
 		}
 	}
+//    [UIApplication sharedApplication].statusBarStyle = UIStatusBarStyleLightContent;
 	[self configureView];
 }
 
@@ -234,11 +232,14 @@ int remainingSound, remainingVibration, remainingBlink, displayTimeMode;
 {
 	if ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPhone) {
 		if (toInterfaceOrientation == UIInterfaceOrientationPortrait) {
-			[[UIApplication sharedApplication] setStatusBarStyle:UIStatusBarStyleBlackTranslucent];
-			[[UIApplication sharedApplication] setStatusBarHidden:NO];
+//			[[UIApplication sharedApplication] setStatusBarStyle:UIStatusBarStyleBlackTranslucent];
+            [UIApplication sharedApplication].statusBarStyle = UIStatusBarStyleLightContent;
+//			[[UIApplication sharedApplication] setStatusBarHidden:NO];
+            [UIApplication sharedApplication].statusBarHidden = NO;
 		}
 		else {
-			[[UIApplication sharedApplication] setStatusBarHidden:YES];
+//			[[UIApplication sharedApplication] setStatusBarHidden:YES];
+            [UIApplication sharedApplication].statusBarHidden = YES;
 		}
 	}
 }
@@ -253,14 +254,16 @@ int remainingSound, remainingVibration, remainingBlink, displayTimeMode;
 - (void)splitViewController:(UISplitViewController *)splitController willHideViewController:(UIViewController *)viewController withBarButtonItem:(UIBarButtonItem *)barButtonItem forPopoverController:(UIPopoverController *)popoverController
 {
     barButtonItem.title = NSLocalizedString(@"TimeKeeper", @"TimeKeeper");
-    [self.navigationItem setLeftBarButtonItem:barButtonItem animated:YES];
+//    [self.navigationItem setLeftBarButtonItem:barButtonItem animated:YES];
+    self.navigationItem.leftBarButtonItem = barButtonItem;
     self.masterPopoverController = popoverController;
 }
 
 - (void)splitViewController:(UISplitViewController *)splitController willShowViewController:(UIViewController *)viewController invalidatingBarButtonItem:(UIBarButtonItem *)barButtonItem
 {
     // Called when the view is shown again in the split view, invalidating the button and popover controller.
-    [self.navigationItem setLeftBarButtonItem:nil animated:YES];
+//    [self.navigationItem setLeftBarButtonItem:nil animated:YES];
+    self.navigationItem.leftBarButtonItem = nil;
     _masterPopoverController = nil;
 }
 
@@ -271,20 +274,26 @@ int remainingSound, remainingVibration, remainingBlink, displayTimeMode;
 
 #pragma mark - TimeKeeper
 
-- (IBAction)tapCounter:(id)sender {
-    remainingTimeMode = !remainingTimeMode;
-    displayTimeMode = 15;
-    [self updateCounterLabel];
-    [self updateTimeMode];
-}
+//- (IBAction)tapCounter:(id)sender {
+//    remainingTimeMode = !remainingTimeMode;
+//    displayTimeMode = 15;
+//    [self updateCounterLabel];
+//    [self updateTimeMode];
+//}
 
-- (IBAction)tap:(id)sender {
-	if ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPhone) {
-		UIInterfaceOrientation orientation = [[UIApplication sharedApplication] statusBarOrientation];
-		if (orientation != UIInterfaceOrientationPortrait) {
-			_buttonSubView.hidden = !_buttonSubView.hidden;
+- (IBAction)tap:(UITapGestureRecognizer *)sender {
+    if (sender.view == self.view) {
+        UIInterfaceOrientation orientation = [[UIApplication sharedApplication] statusBarOrientation];
+		if (orientation != UIInterfaceOrientationPortrait && orientation != UIInterfaceOrientationPortraitUpsideDown) {
+			_operationBar.hidden = !_operationBar.hidden;
 		}
 	}
+    else if (sender.view == _counterLabel) {
+        remainingTimeMode = !remainingTimeMode;
+        displayTimeMode = 15;
+        [self updateCounterLabel];
+        [self updateTimeMode];
+    }
 }
 
 - (void)onTimerFirstStart:(NSTimer *)theTimer
@@ -314,39 +323,60 @@ int remainingSound, remainingVibration, remainingBlink, displayTimeMode;
 - (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender
 {
 	y3EditViewController *editViewController = (y3EditViewController *)[segue destinationViewController];
-	[editViewController setReferenceViewController:self];
-	[editViewController setDetailItem:_detailItem];
+	editViewController.referenceViewController = self;
+	editViewController.detailItem = _detailItem;
+}
+
+- (void)startCounter
+{
+    if (!timer) {
+        startDate = [NSDate date];
+        timer = [NSTimer scheduledTimerWithTimeInterval:0.2f target:self selector:@selector(onTimer:) userInfo:nil repeats:YES];
+        if ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPhone) {
+            // backボタンを押せないダミーに変える
+            UIButton* backButton = [UIButton buttonWithType:101];
+//            [backButton addTarget:self action:nil forControlEvents:UIControlEventTouchUpInside];
+            [backButton setTitle:NSLocalizedString(@"TimeKeeper", @"TimeKeeper") forState:UIControlStateNormal];
+            UIBarButtonItem* backItem = [[UIBarButtonItem alloc] initWithCustomView:backButton];
+            _navItem.leftBarButtonItem = backItem;
+            _navItem.leftBarButtonItem.enabled = NO;
+        }
+        else self.navigationItem.leftBarButtonItem.enabled = NO;
+        _editButton.enabled = NO;
+        [UIApplication sharedApplication].idleTimerDisabled = YES;	// スリープさせない
+        UIBarButtonItem *button;
+        button = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemPause target:self action:@selector(pushStart:)];
+        NSMutableArray *array;
+        array = [_operationBar.items mutableCopy];
+        [array removeObjectAtIndex:3];
+        [array insertObject:button atIndex:3];
+        _operationBar.items = array;
+        _operationBar.alpha = 0.5f;
+    }
+    else {
+        elapsedSec -= [startDate timeIntervalSinceNow];
+        [timer invalidate];
+        timer = nil;
+        if ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPhone)
+            _navItem.leftBarButtonItem = nil;	// ダミーを消すとbackボタンが復活
+        else self.navigationItem.leftBarButtonItem.enabled = YES;
+        _editButton.enabled = YES;
+        [UIApplication sharedApplication].idleTimerDisabled = NO;	// スリープ有効に戻す
+        UIBarButtonItem *button;
+        button = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemPlay target:self action:@selector(pushStart:)];
+        NSMutableArray *array;
+        array = [_operationBar.items mutableCopy];
+        [array removeObjectAtIndex:3];
+        [array insertObject:button atIndex:3];
+        _operationBar.items = array;
+        _operationBar.alpha = 1.0f;
+    }
 }
 
 - (IBAction)pushStart:(id)sender
 {
-	if (!timer) {
-		startDate = [NSDate date];
-		timer = [NSTimer scheduledTimerWithTimeInterval:0.2f target:self selector:@selector(onTimer:) userInfo:nil repeats:YES];
-		if ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPhone) {
-			// backボタンを押せないダミーに変える
-			UIButton* backButton = [UIButton buttonWithType:101];
-			[backButton addTarget:self action:nil forControlEvents:UIControlEventTouchUpInside];
-			[backButton setTitle:NSLocalizedString(@"TimeKeeper", @"TimeKeeper") forState:UIControlStateNormal];
-			UIBarButtonItem* backItem = [[UIBarButtonItem alloc] initWithCustomView:backButton];
-			[_navItem setLeftBarButtonItem:backItem];
-			[_navItem.leftBarButtonItem setEnabled:NO];
-		}
-		else [self.navigationItem.leftBarButtonItem setEnabled:NO];
-		[_editButton setEnabled:NO];
-		[[UIApplication sharedApplication] setIdleTimerDisabled:YES];	// スリープさせない
-	}
-	else {
-		elapsedSec -= [startDate timeIntervalSinceNow];
-		[timer invalidate];
-		timer = nil;
-		if ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPhone)
-			[_navItem setLeftBarButtonItem:nil];	// ダミーを消すとbackボタンが復活
-		else [self.navigationItem.leftBarButtonItem setEnabled:YES];
-		[_editButton setEnabled:YES];
-		[[UIApplication sharedApplication] setIdleTimerDisabled:NO];	// スリープ有効に戻す
-	}
-	if (_buttonSubView.hidden) [_buttonSubView setHidden:NO];
+    [self startCounter];
+	_operationBar.hidden = NO;
 }
 
 - (void)resetCounter
@@ -354,16 +384,16 @@ int remainingSound, remainingVibration, remainingBlink, displayTimeMode;
 	isStruckSingle = isStruckDouble = isStruckTriple = NO;
 	elapsedSec = 0.0f;
 	startDate = [NSDate date];
-	_timeProgressView.progress = 0.0f;
+    _timeProgressView.progress = 0.0f;
 	_counterLabel.textColor = [UIColor colorWithRed:1.0f green:1.0f blue:1.0f alpha:1.0f];
-	_timeProgressView.progressTintColor = [UIColor colorWithRed:1.0f green:191.0f/255.0f blue:83.0f/255.0f alpha:1.0f];
+    _timeProgressView.progressTintColor = [UIColor colorWithRed:1.0f green:191.0f/255.0f blue:83.0f/255.0f alpha:1.0f];
     [self updateCounterLabel];
 }
 
 - (IBAction)pushReset:(id)sender
 {
 	[self resetCounter];
-	if (_buttonSubView.hidden) [_buttonSubView setHidden:NO];
+	if (_operationBar.hidden) _operationBar.hidden = NO;
 }
 
 static void endSound(SystemSoundID ssID, void *myself)
@@ -416,15 +446,15 @@ static void endSound(SystemSoundID ssID, void *myself)
     UIColor *color;
     if (remainingBlink % 2 == 1) {
         color = [UIColor colorWithRed:1.0f green:1.0f blue:1.0f alpha:1.0f];
-        [_buttonSubView setAlpha:0.0f];
-        [_timeProgressView setAlpha:0.0f];
+        _operationBar.alpha = 0.0f;
+        _timeProgressView.alpha = 0.0f;
     }
     else {
-        color = [UIColor colorWithRed:0.29194f green:0.263998f blue:0.239367f alpha:1.0f];
-        [_buttonSubView setAlpha:1.0f];
-        [_timeProgressView setAlpha:1.0f];
+        color = [UIColor colorWithRed:0.121587f green:0.129412f blue:0.141118f alpha:1.0f];
+        _operationBar.alpha = 1.0f;
+        _timeProgressView.alpha = 1.0f;
     }
-    [_detailView setBackgroundColor:color];
+    _detailView.backgroundColor = color;
     if (remainingBlink <= 0) {
         if (blinkTimer) [blinkTimer invalidate];
         blinkTimer = nil;
@@ -455,15 +485,15 @@ static void endSound(SystemSoundID ssID, void *myself)
 - (IBAction)pushBell:(id)sender
 {
 	[self ringBell:1];
-	if (_buttonSubView.hidden) [_buttonSubView setHidden:NO];
+	if (_operationBar.hidden) _operationBar.hidden = NO;
 }
 
 - (void)onTimer:(NSTimer *)theTimer
 {
     NSTimeInterval t = -[startDate timeIntervalSinceNow] + elapsedSec;
-	_timeProgressView.progress = t / finishSec;
+    _timeProgressView.progress = t / finishSec;
 	if (t > finishSec) {
-		_timeProgressView.progressTintColor = [UIColor colorWithRed:1.0f green:0.3f blue:0.0f alpha:1.0f];
+        _timeProgressView.progressTintColor = [UIColor colorWithRed:1.0f green:0.3f blue:0.0f alpha:1.0f];
 		_counterLabel.textColor = [UIColor colorWithRed:1.0f green:0.8f blue:0.75f alpha:1.0f];
 	}
 	if (!isStruckSingle && t >= singleSec) {
@@ -474,7 +504,7 @@ static void endSound(SystemSoundID ssID, void *myself)
 		isStruckDouble = YES;
 		[self ringBell:2];
 	}
-	if (!isStruckTriple && t >= tripleSec && tripleBell) {
+	if (!isStruckTriple && t >= tripleSec && doubleBell && tripleBell) {
 		isStruckTriple = YES;
 		[self ringBell:3];
 	}
@@ -504,10 +534,10 @@ static void endSound(SystemSoundID ssID, void *myself)
 }
 
 - (void)displayClockInNavigationBar {
-	NSDateFormatter *formatter = [[NSDateFormatter alloc] init];
-	[formatter setLocale:[NSLocale systemLocale]];
-	[formatter setTimeZone:[NSTimeZone systemTimeZone]];
-	[formatter setDateFormat:@"HH:mm:ss"];
+	NSDateFormatter *formatter = [NSDateFormatter new];
+    formatter.locale = [NSLocale systemLocale];
+    formatter.timeZone = [NSTimeZone systemTimeZone];
+    formatter.dateFormat = @"HH:mm:ss";
 	self.navigationItem.title = [formatter stringFromDate:[NSDate date]];
 }
 
@@ -521,6 +551,35 @@ static void endSound(SystemSoundID ssID, void *myself)
     else if ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPhone && orientation != UIInterfaceOrientationPortrait)
         [self displayClockInNavigationBar];
     else self.navigationItem.title = @"";
+}
+
+- (IBAction)pushStartKey:(id)sender
+{
+    [self startCounter];
+}
+
+- (IBAction)pushResetKey:(id)sender
+{
+    [self resetCounter];
+}
+
+- (IBAction)pushBellKey:(id)sender
+{
+    [self ringBell:1];
+}
+
+- (NSArray *)keyCommands {
+    return @[
+             [UIKeyCommand keyCommandWithInput: UIKeyInputLeftArrow
+                                 modifierFlags: 0
+                                        action: @selector(pushResetKey:)],
+             [UIKeyCommand keyCommandWithInput: @" "
+                                 modifierFlags: 0
+                                        action: @selector(pushStartKey:)],
+             [UIKeyCommand keyCommandWithInput: @"b"
+                                 modifierFlags: 0
+                                        action: @selector(pushBellKey:)],
+             ];
 }
 
 @end

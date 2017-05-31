@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>IDESourceControlProjectFavoriteDictionaryKey</key>
+	<false/>
+	<key>IDESourceControlProjectIdentifier</key>
+	<string>42E434B7-9D9E-452C-8580-A673DB86F2E2</string>
+	<key>IDESourceControlProjectName</key>
+	<string>TimeKeeper</string>
+	<key>IDESourceControlProjectOriginsDictionary</key>
+	<dict>
+		<key>484AE5FBCC93CC36EE4F8E33F6E99D20E6462D0F</key>
+		<string>github.com:YasSo/TimeKeeper.git</string>
+	</dict>
+	<key>IDESourceControlProjectPath</key>
+	<string>TimeKeeper.xcodeproj</string>
+	<key>IDESourceControlProjectRelativeInstallPathDictionary</key>
+	<dict>
+		<key>484AE5FBCC93CC36EE4F8E33F6E99D20E6462D0F</key>
+		<string>../..</string>
+	</dict>
+	<key>IDESourceControlProjectURL</key>
+	<string>github.com:YasSo/TimeKeeper.git</string>
+	<key>IDESourceControlProjectVersion</key>
+	<integer>111</integer>
+	<key>IDESourceControlProjectWCCIdentifier</key>
+	<string>484AE5FBCC93CC36EE4F8E33F6E99D20E6462D0F</string>
+	<key>IDESourceControlProjectWCConfigurations</key>
+	<array>
+		<dict>
+			<key>IDESourceControlRepositoryExtensionIdentifierKey</key>
+			<string>public.vcs.git</string>
+			<key>IDESourceControlWCCIdentifierKey</key>
+			<string>484AE5FBCC93CC36EE4F8E33F6E99D20E6462D0F</string>
+			<key>IDESourceControlWCCName</key>
+			<string>TimeKeeper</string>
+		</dict>
+	</array>
+</dict>
+</plist>

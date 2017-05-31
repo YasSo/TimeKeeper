@@ -13,20 +13,6 @@
 
 @implementation y3EditViewController
 
-@synthesize editItem = _editItem;
-@synthesize settingMemoField = _settingMemoField;
-@synthesize vibrateSW = _vibrateSW;
-@synthesize flashScreenSW = _flashScreenSW;
-@synthesize doubleBellSW = _doubleBellSW;
-@synthesize tripleBellSW = _tripleBellSW;
-@synthesize singleMinStepper = _singleMinStepper;
-@synthesize doubleMinStepper = _doubleMinStepper;
-@synthesize tripleMinStepper = _tripleMinStepper;
-@synthesize singleMinField = _singleMinField;
-@synthesize doubleMinField = _doubleMinField;
-@synthesize tripleMinField = _tripleMinField;
-@synthesize referenceViewController = _referenceViewController;
-
 - (void)setDetailItem:(id)newItem
 {
 	_editItem = newItem;
@@ -47,7 +33,8 @@
 	// Do any additional setup after loading the view.
 	self.navigationItem.title = NSLocalizedString(@"Edit", @"Edit");
 	if ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPad) {
-		self.contentSizeForViewInPopover = CGSizeMake(320, 550);
+//		self.contentSizeForViewInPopover = CGSizeMake(320, 550);
+        self.preferredContentSize = CGSizeMake(360, 620);
 	}
 }
 
@@ -249,9 +236,9 @@
 
 - (void)timeFieldEditingDidBegin:(UITextField *)sender
 {
-	if (sender == _singleMinField) _singleMinField.text = [[NSString alloc] initWithFormat:@"%d", [[_editItem valueForKey:@"singleMinutes"] integerValue]];
-	if (sender == _doubleMinField) _doubleMinField.text = [[NSString alloc] initWithFormat:@"%d", [[_editItem valueForKey:@"doubleMinutes"] integerValue]];
-	if (sender == _tripleMinField) _tripleMinField.text = [[NSString alloc] initWithFormat:@"%d", [[_editItem valueForKey:@"tripleMinutes"] integerValue]];
+	if (sender == _singleMinField) _singleMinField.text = [[NSString alloc] initWithFormat:@"%ld", (long)[[_editItem valueForKey:@"singleMinutes"] integerValue]];
+	if (sender == _doubleMinField) _doubleMinField.text = [[NSString alloc] initWithFormat:@"%ld", (long)[[_editItem valueForKey:@"doubleMinutes"] integerValue]];
+	if (sender == _tripleMinField) _tripleMinField.text = [[NSString alloc] initWithFormat:@"%ld", (long)[[_editItem valueForKey:@"tripleMinutes"] integerValue]];
 }
 
 - (void)closeKeyboard:(id)sender
@@ -281,7 +268,7 @@
         noteSection = 3;
     }
     if (indexPath.section == optionSection) {
-        UISwitch *sw = [[UISwitch alloc] init];
+        UISwitch *sw = [UISwitch new];
         [sw addTarget:self action:@selector(switchChanged:) forControlEvents:UIControlEventValueChanged];
         [cell setAccessoryView:sw];
         if (indexPath.row == 0) {
@@ -300,7 +287,7 @@
 		UITextField *field = [[UITextField alloc] initWithFrame:CGRectMake(0, 0, 190, cell.frame.size.height)];
 		[field setTextColor:[UIColor colorWithRed:59.0/255.0 green:85.0/255.0 blue:133.0/255.0 alpha:1.0]];
 		[field setContentVerticalAlignment:UIControlContentVerticalAlignmentCenter];
-		[field setTextAlignment:UITextAlignmentLeft];
+		[field setTextAlignment:NSTextAlignmentLeft];
 		[field setText:[[_editItem valueForKey:@"note"] description]];
 		[field setPlaceholder:NSLocalizedString(@"SettingMemoPlaceholder", @"Option")];
 		[field setKeyboardType:UIKeyboardTypeDefault];
@@ -315,7 +302,7 @@
     }
 	else {
         if (indexPath.row == 0) {
-            UISwitch *sw = [[UISwitch alloc] init];
+            UISwitch *sw = [UISwitch new];
 			[sw addTarget:self action:@selector(switchChanged:) forControlEvents:UIControlEventValueChanged];
 			[cell setAccessoryView:sw];
 			switch (indexPath.section) {
@@ -344,7 +331,7 @@
 			[subview addSubview:timeField];
 			[subview addSubview:stepper];
 			[timeField setTextColor:[UIColor colorWithRed:59.0/255.0 green:85.0/255.0 blue:133.0/255.0 alpha:1.0]];
-			[timeField setTextAlignment:UITextAlignmentRight];
+			[timeField setTextAlignment:NSTextAlignmentRight];
 			[timeField setContentVerticalAlignment:UIControlContentVerticalAlignmentCenter];
 			[timeField setKeyboardType:UIKeyboardTypeNumberPad];
 			[timeField setReturnKeyType:UIReturnKeyDone];
@@ -365,10 +352,10 @@
 			[stepper setStepValue:1.0];
 			[stepper addTarget:self action:@selector(stepperChanged:) forControlEvents:UIControlEventValueChanged];
 			cell.accessoryView = subview;
-			int singleMinutes = [[_editItem valueForKey:@"singleMinutes"] integerValue];
-			int doubleMinutes = [[_editItem valueForKey:@"doubleMinutes"] integerValue];
+			long singleMinutes = [[_editItem valueForKey:@"singleMinutes"] integerValue];
+			long doubleMinutes = [[_editItem valueForKey:@"doubleMinutes"] integerValue];
 			if (doubleMinutes <= singleMinutes) doubleMinutes = singleMinutes + 1;
-			int tripleMinutes = [[_editItem valueForKey:@"tripleMinutes"] integerValue];
+			long tripleMinutes = [[_editItem valueForKey:@"tripleMinutes"] integerValue];
 			if (tripleMinutes <= doubleMinutes) tripleMinutes = doubleMinutes + 1;
 			switch (indexPath.section) {
 				case 0:
@@ -377,7 +364,7 @@
 					else if ([[_editItem valueForKey:@"doubleBell"] boolValue]) [stepper setMaximumValue:998.0];
 					else [stepper setMaximumValue:999.0];
 					[stepper setValue:(double)singleMinutes];
-					[timeField setText:[self minuteString:singleMinutes]];
+					[timeField setText:[self minuteString:(int)singleMinutes]];
 					[self setSingleMinStepper:stepper];
 					[self setSingleMinField:timeField];
 					break;
@@ -386,7 +373,7 @@
 					if ([[_editItem valueForKey:@"tripleBell"] boolValue]) [stepper setMaximumValue:998.0];
 					else [stepper setMaximumValue:999.0];
 					[stepper setValue:(double)doubleMinutes];
-					[timeField setText:[self minuteString:doubleMinutes]];
+					[timeField setText:[self minuteString:(int)doubleMinutes]];
 					[self setDoubleMinStepper:stepper];
 					[self setDoubleMinField:timeField];
 					break;
@@ -394,7 +381,7 @@
 					[stepper setMinimumValue:3.0];
 					[stepper setMaximumValue:999.0];
 					[stepper setValue:(double)tripleMinutes];
-					[timeField setText:[self minuteString:tripleMinutes]];
+					[timeField setText:[self minuteString:(int)tripleMinutes]];
 					[self setTripleMinStepper:stepper];
 					[self setTripleMinField:timeField];
 					break;
